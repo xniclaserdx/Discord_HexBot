@@ -7,6 +7,8 @@ import basiscalc
 import numpy
 import os
 import mc_server_status
+import website_check
+
 
 client = discord.Bot()
 client = discord.Client(intents=discord.Intents.default())
@@ -50,6 +52,8 @@ async def on_message(message):
                         await message.channel.send(mc_server_status.return_server_status(str(user_message_stripped[3]), int(user_message_stripped[4])))
                     except:
                         await message.channel.send(mc_server_status.return_server_status(str(user_message_stripped[3]), 25565))
+                elif user_message_stripped[1].lower()=="isoffline?":
+                    await message.channel.send(website_check.checkSite(user_message_stripped[2]))
                 return
 
 client.run(token)
