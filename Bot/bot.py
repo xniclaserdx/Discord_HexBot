@@ -6,6 +6,7 @@ import python_weather
 import basiscalc
 import numpy
 import os
+import mc_server_status
 
 client = discord.Bot()
 client = discord.Client(intents=discord.Intents.default())
@@ -44,6 +45,8 @@ async def on_message(message):
                     await message.channel.send(str(random.randint(int(user_message_stripped[2]),int(user_message_stripped[4]))))
                 elif user_message_stripped[1].lower()=="coinflip" or user_message_stripped[1].lower()=="Münzwurf":
                     await message.channel.send("Kopf" if random.randint(0,1)==1 else "Zahl")
+                elif user_message_stripped[1].lower()=="mc" and user_message_stripped[2].lower()=="status":
+                    await message.channel.send(mc_server_status.return_server_status(str(user_message_stripped[3]), int(user_message_stripped[4])))
                 return
 
 client.run(token)

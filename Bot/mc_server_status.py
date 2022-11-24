@@ -2,9 +2,12 @@ from mcstatus import JavaServer
 
 
 def return_server_status(server, port):
-    server = JavaServer(server, port)
-    status = server.status()
-    return f"The server has {status.players.online} player(s) online and replied in {status.latency} ms"
+    try:
+        server = JavaServer(server, port)
+        status = server.status()
+        return f"The server has {status.players.online} player(s) online and replied in {round(status.latency,3)} ms"
+    except:
+        return f"Server seems offline..."
 
 
 def return_server_players(server, port):
