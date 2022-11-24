@@ -7,12 +7,7 @@ def return_server_status(server, port):
         status = server.status()
         return f"The server has {status.players.online} player(s) online and replied in {round(status.latency,3)} ms"
     except:
-        try:
-            server = JavaServer(server, 25565)
-            status = server.status()
-            return f"The server has {status.players.online} player(s) online and replied in {round(status.latency,3)} ms"
-        except:
-            return f"Server seems offline..."
+        return f"Server seems offline..."
 
 
 def return_server_players(server, port):

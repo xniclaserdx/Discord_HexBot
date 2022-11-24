@@ -46,7 +46,10 @@ async def on_message(message):
                 elif user_message_stripped[1].lower()=="coinflip" or user_message_stripped[1].lower()=="Münzwurf":
                     await message.channel.send("Kopf" if random.randint(0,1)==1 else "Zahl")
                 elif user_message_stripped[1].lower()=="mc" and user_message_stripped[2].lower()=="status":
-                    await message.channel.send(mc_server_status.return_server_status(str(user_message_stripped[3]), int(user_message_stripped[4])))
+                    if int(user_message_stripped[4]):
+                        await message.channel.send(mc_server_status.return_server_status(str(user_message_stripped[3]), int(user_message_stripped[4])))
+                    else:
+                        await message.channel.send(mc_server_status.return_server_status(str(user_message_stripped[3]), 25565))
                 return
 
 client.run(token)
