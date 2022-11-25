@@ -13,7 +13,9 @@ import matrixmodule
 client = discord.Bot()
 client = discord.Client(intents=discord.Intents.default())
 
-token = "MTA0NTI5Nzk1NzQ2NzA2NjQyOA.G7XXPA.591eWjAryt2JgNuGoLZKMtBDk-djUHh4JOJTUY"
+text_file = open(os.path.dirname(os.path.abspath(__file__))+"/TOKEN.txt", "r")
+token = text_file.read()
+text_file.close()
 
 @client.event
 async def on_ready():
