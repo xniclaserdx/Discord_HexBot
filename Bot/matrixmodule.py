@@ -72,6 +72,7 @@ def bracketEvaluation(elementList):
         return eval(res)
     return None
             
+# evaluate multiplication
 def multEvaluation(elementList):
     for i in range(len(elementList)):
         if elementList[i].type == "operator" and elementList[i].value == "X":
@@ -86,6 +87,7 @@ def multEvaluation(elementList):
             return eval(res)
     return None
 
+# evaluate addition and subtraction
 def addsubEvaluation(elementList):
     for i in range(len(elementList)):
         if elementList[i].type == "operator" and (elementList[i].value == "+" or elementList[i].value == "-"):
