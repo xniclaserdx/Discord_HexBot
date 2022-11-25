@@ -3,8 +3,7 @@ import numpy as np
 def mathInputEvaluate(args):
     arglen = len(args)
     if arglen <= 1:
-        error("not enough arguments")
-        return returnError()
+        return "Zu wenig input uff"
     formattedInputList = [None]*arglen
     for i in range(arglen):
         try:
