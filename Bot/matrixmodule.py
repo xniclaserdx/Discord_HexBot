@@ -184,10 +184,6 @@ def matrixType(matrix):
                     type = "str"
     return type
 
-# final error String to be returned
-def returnError():
-    return "MathModuleError: "+errorStr
-
 # class for formatting user input to differentiate between operators, matrices etc.
 class Element(object):
     def __init__(self,value,type,description):
