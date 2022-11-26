@@ -110,12 +110,7 @@ def bracketEvaluation(elementList):
     if firstbracketIndex != -1:
         if firstbracketIndex + 1 == secondbracketIndex:
             raise EmptyBracketsError
-        print('firstInd:')
-        print(firstbracketIndex)
-        print('secondInd:')
-        print(secondbracketIndex)
         bracketEval = eval(elementList[firstbracketIndex+1:secondbracketIndex]).value
-        print(bracketEval)
         beforeBrack = elementList[0:firstbracketIndex]
         afterBrack = []
         # check if second bracket is last element
