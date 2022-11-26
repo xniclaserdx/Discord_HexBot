@@ -2,7 +2,8 @@ import numpy as np
 import texmodule
 
 async def mathInputEvaluate(args):
-    return await texmodule.texToPng(r'\documentclass{article}\begin{document}$\frac{3}{2} \cdot \frac{2}{3} = 1$ \end{document}')
+    #\color{white}
+    return await texmodule.texToPng(r'\documentclass{article}\usepackage{xcolor}\begin{document}\thispagestyle{empty}$\frac{3}{2} \cdot \frac{2}{3} = 1$ \end{document}')
     arglen = len(args)
     if arglen <= 1:
         return "Bitte gebe weitere Argumente an"

@@ -58,8 +58,11 @@ async def on_message(message):
                 elif user_message_stripped[1].lower()=="isoffline?":
                     await message.channel.send(website_check.checkSite(user_message_stripped[2]))
                 elif user_message_stripped[1].lower() =="matrix":
-                    data = await matrixmodule.mathInputEvaluate(user_message_stripped[2:len(user_message_stripped)]).read()
-                    await message.channel.send(file=discord.File(data, filename='respone.png'))
+                    image = await matrixmodule.mathInputEvaluate(user_message_stripped[2:len(user_message_stripped)])
+                    imageByteArr = io.BytesIO()
+                    image.save(imageByteArr,format='PNG')
+                    imageByteArr.seek(0)
+                    await message.channel.send(file=discord.File(imageByteArr, filename='respone.png'))
                 return
 
 client.run(token)
