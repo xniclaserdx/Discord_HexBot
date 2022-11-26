@@ -5,6 +5,7 @@ import aiohttp
 import numpy as np
 
 async def texToPng(latex):
+    print(latex)
     payload = {
         'format': 'png',
         'code': latex,
@@ -46,5 +47,5 @@ def bbox(im):
     return (x0, y0, x1+1, y1+1)
 
 
-class RenderingError:
+class RenderingError(Exception):
     pass

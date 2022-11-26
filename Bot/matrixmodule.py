@@ -2,38 +2,85 @@ import numpy as np
 import texmodule
 
 async def mathInputEvaluate(args):
-    #\color{white}
-    return await texmodule.texToPng(r'\documentclass{article}\usepackage{xcolor}\begin{document}\thispagestyle{empty}$\frac{3}{2} \cdot \frac{2}{3} = 1$ \end{document}')
+    # return await texmodule.texToPng(r'\documentclass{article}\usepackage{xcolor}\begin{document}\thispagestyle{empty}$\frac{3}{2} \cdot \frac{2}{3} = 1$ \end{document}')
     arglen = len(args)
     if arglen <= 1:
-        return "Bitte gebe weitere Argumente an"
+        # zu wenig Argumente
+        return await texmodule.texToPng(texErrOut)
     formattedInputList = [None]*arglen
     for i in range(arglen):
         try:
             formattedInputList[i] = formatInput(args[i])
         except:
-            return "Formatierungsfehler"
-    return eval(formattedInputList)
+            # Formatierungsfehler
+            return await texmodule.texToPng(texErrOut)
+    texString = texOut(elementListtoTex(formattedInputList),matrixToTex(eval(formattedInputList).value))
+    return await texmodule.texToPng(texString)
     
 def printvals(elementList):
     for i in range(len(elementList)):
         print(elementList[i].value)
 
+def elementListtoTex(elementList):
+    texString = ''
+    for i in elementList:
+        if i.type == 'bracket':
+            texString += i.value
+        elif i.type == 'operator':
+            match i.value:
+                case '+':
+                    texString += '+'
+                case '-':
+                    texString += '-'
+                case 'X':
+                    texString += r'\cdot '
+        elif i.type == 'matrix':
+            texString += matrixToTex(i.value)
+    return texString
+
+def matrixToTex(matrix):
+    rows, cols = matrix.shape
+    matTexBeg = r'\left(\begin{array}{'+cols*'c'+'}'
+    matTexEnd = r'\end{array}\right)'
+    matTexMid = ''
+    for i in range(rows):
+        for j in range(cols):
+            if j == 0:
+                matTexMid += str(matrix.item((i,j)))
+            elif j == cols-1:
+                matTexMid += r'&'+ str(matrix.item((i,j)))+r'\\'
+            else:
+                matTexMid += r'&'+ str(matrix.item((i,j)))
+    return matTexBeg+matTexMid+matTexEnd
+
+def texOut(input,output):
+    latexStart = r'\documentclass{article}\begin{document}\thispagestyle{empty}$'
+    latexMid = r'\\~\\ = '
+    latexEnd = r'$\end{document}'
+    return latexStart + input + latexMid + output + latexEnd
+
+def texErrOut(error):
+    # error muss hier noch verwendet werden (zu implementieren)
+    latexStart = r'\documentclass{article}\begin{document}\thispagestyle{empty}Fehler'
+    latexEnd = r'\end{document}'
+    return latexStart + latexEnd
+        
+
 def eval(elementList):
     if len(elementList) == 1:
-        return elementList[0].value
+        return elementList[0]
     # bracket evaluation
     brackEval = bracketEvaluation(elementList)
-    if brackEval != None:
-        return brackEval
+    if brackEval[1]:
+        return brackEval[0]
     # multiplication evaluation
     multEval = multEvaluation(elementList)
-    if multEval != None:
-        return multEval
+    if multEval[1]:
+        return multEval[0]
     # addition and subtraction evaluation
     addsubEval = addsubEvaluation(elementList)
-    if addsubEval.any() != None:
-        return addsubEval
+    if addsubEval[1]:
+        return addsubEval[0]
 
 # bracketEvaluation     
 def bracketEvaluation(elementList):
@@ -63,7 +110,12 @@ def bracketEvaluation(elementList):
     if firstbracketIndex != -1:
         if firstbracketIndex + 1 == secondbracketIndex:
             raise EmptyBracketsError
-        bracketEval = eval(elementList[firstbracketIndex+1:secondbracketIndex])
+        print('firstInd:')
+        print(firstbracketIndex)
+        print('secondInd:')
+        print(secondbracketIndex)
+        bracketEval = eval(elementList[firstbracketIndex+1:secondbracketIndex]).value
+        print(bracketEval)
         beforeBrack = elementList[0:firstbracketIndex]
         afterBrack = []
         # check if second bracket is last element
@@ -72,8 +124,8 @@ def bracketEvaluation(elementList):
         else:
             afterBrack = []
         res = elementsJoin(beforeBrack,bracketEval,afterBrack)
-        return eval(res)
-    return None
+        return eval(res), True
+    return None, False
             
 # evaluate multiplication
 def multEvaluation(elementList):
@@ -87,8 +139,8 @@ def multEvaluation(elementList):
             except:
                 raise MatrixMultiplicationError
             res = elementsJoin(beforeMult,multEval,afterMult)
-            return eval(res)
-    return None
+            return eval(res), True
+    return None, False
 
 # evaluate addition and subtraction
 def addsubEvaluation(elementList):
@@ -108,14 +160,15 @@ def addsubEvaluation(elementList):
                     except:
                         raise MatrixAdditionError
                     res = elementsJoin(beforeOp,addEval,afterOp)
-                    return eval(res)
+                    return eval(res), True
                 case "-":
                     try:
                         subEval = elementList[i-1].value - elementList[i+1].value
                     except:
                         raise MatrixSubtractionError
                     res = elementsJoin(beforeOp,subEval,afterOp)
-                    return eval(res)
+                    return eval(res), True
+    return None, False
 
 def validBinaryOpPosition(elementList,i):
     if i == 0 or i+1 == len(elementList) or elementList[i-1].type != "matrix" or elementList[i+1].type != "matrix":
@@ -142,7 +195,7 @@ def toMatrix(string):
     
 def elementsJoin(list1,matrix,list2):
     res = list1
-    res.append(Element(matrix,"Matrix","None"))
+    res.append(Element(matrix,"matrix","None"))
     res.extend(list2)
     return res
 
@@ -195,32 +248,33 @@ class Element(object):
         self.value = value
         self.type = type
         self.description = description
-    
-        
+
+
+
 # error classes    
-class MatrixParseError:
+class MatrixParseError(Exception):
     pass
 
-class BracketMismatchError:
+class BracketMismatchError(Exception):
     pass
 
-class EmptyBracketsError:
+class EmptyBracketsError(Exception):
     pass
 
-class MultiplicationOperandError:
+class MultiplicationOperandError(Exception):
     pass
     
-class MatrixMultiplicationError:
+class MatrixMultiplicationError(Exception):
     pass
 
-class AdditionOperandError:
+class AdditionOperandError(Exception):
     pass
 
-class MatrixAdditionError:
+class MatrixAdditionError(Exception):
     pass
 
-class SubtractionOperandError:
+class SubtractionOperandError(Exception):
     pass
     
-class MatrixSubtractionError:
+class MatrixSubtractionError(Exception):
     pass
