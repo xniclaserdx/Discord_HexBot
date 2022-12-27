@@ -4,9 +4,6 @@ import texmodule
 async def mathInputEvaluate(args):
     # return await texmodule.texToPng(r'\documentclass{article}\usepackage{xcolor}\begin{document}\thispagestyle{empty}$\frac{3}{2} \cdot \frac{2}{3} = 1$ \end{document}')
     arglen = len(args)
-    if arglen <= 1:
-        # zu wenig Argumente
-        return await texmodule.texToPng(texErrOut)
     formattedInputList = [None]*arglen
     for i in range(arglen):
         try:
@@ -53,11 +50,11 @@ def matrixToTex(matrix):
                 matTexMid += r'&'+ str(matrix.item((i,j)))
     return matTexBeg+matTexMid+matTexEnd
 
-def texOut(input,output):
+def texOut(input_,output):
     latexStart = r'\documentclass{article}\begin{document}\thispagestyle{empty}$'
     latexMid = r'\\~\\ = '
     latexEnd = r'$\end{document}'
-    return latexStart + input + latexMid + output + latexEnd
+    return latexStart + input_ + latexMid + output + latexEnd
 
 def texErrOut(error):
     # error muss hier noch verwendet werden (zu implementieren)
@@ -151,14 +148,14 @@ def addsubEvaluation(elementList):
             match elementList[i].value:
                 case "+":
                     try:
-                        addEval = elementList[i-1].value + elementList[i+1].value
+                        addEval = np.add(elementList[i-1].value,elementList[i+1].value)
                     except:
                         raise MatrixAdditionError
                     res = elementsJoin(beforeOp,addEval,afterOp)
                     return eval(res), True
                 case "-":
                     try:
-                        subEval = elementList[i-1].value - elementList[i+1].value
+                        subEval = np.subtract(elementList[i-1].value,elementList[i+1].value)
                     except:
                         raise MatrixSubtractionError
                     res = elementsJoin(beforeOp,subEval,afterOp)
@@ -210,13 +207,18 @@ def formatInput(input):
         case _:
             matString = textMatrixFormat(input)
             try: 
-                return Element(np.matrix(matString),"matrix","None")
+                mat_rows = matString.split(";")
+                mat_rows = list(map(lambda x: x.split(" "),mat_rows))
+                for r,row in enumerate(mat_rows):
+                    for c,element in enumerate(row):
+                        mat_rows[r][c] = int(element)
+                return Element(np.array(mat_rows),"matrix","None")
             except:
                 raise MatrixParseError
 
 # changes user input to allow conversion into a matrix
 def textMatrixFormat(input):
-    return input.replace(',',' ')
+    return input.replace(',',' ')[1:-1]
 
 # determine whether the input can be interpreted as a matrix of numeric values or if it has to be treated as string matrix
 def matrixType(matrix):
@@ -239,9 +241,9 @@ def matrixType(matrix):
 
 # class for formatting user input to differentiate between operators, matrices etc.
 class Element(object):
-    def __init__(self,value,type,description):
+    def __init__(self,value,ptype,description):
         self.value = value
-        self.type = type
+        self.type = ptype
         self.description = description
 
 

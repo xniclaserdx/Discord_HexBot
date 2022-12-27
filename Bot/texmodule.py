@@ -5,6 +5,7 @@ import aiohttp
 import numpy as np
 
 async def texToPng(latex):
+    print(latex)
     payload = {
         'format': 'png',
         'code': latex,
@@ -25,16 +26,14 @@ async def texToPng(latex):
                 image = PIL.Image.open(imgData).convert('RGBA')
         except aiohttp.client_exceptions.ClientResponseError:
             raise RenderingError
-        image = image.crop(bbox(image))
-
-        # Farben invertieren
-        r,g,b,a = image.split()
-        rgb_image = PIL.Image.merge('RGB', (r,g,b))
-        inverted_image = PIL.ImageOps.invert(rgb_image)
-        r2,g2,b2 = inverted_image.split()
-        final_transparent_image = PIL.Image.merge('RGBA', (r2,g2,b2,a))
-
-        return final_transparent_image
+    image = image.crop(bbox(image))
+    # Farben invertieren
+    r,g,b,a = image.split()
+    rgb_image = PIL.Image.merge('RGB', (r,g,b))
+    inverted_image = PIL.ImageOps.invert(rgb_image)
+    r2,g2,b2 = inverted_image.split()
+    final_transparent_image = PIL.Image.merge('RGBA', (r2,g2,b2,a))
+    return final_transparent_image
     
     # Bild zuschneiden
 def bbox(im):
