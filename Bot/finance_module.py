@@ -26,7 +26,7 @@ class FinanceModule(interactions.Extension):
 
     # command to get stock values
     @interactions.extension_command(
-        name ="finance_price",
+        name ="hex_finance_price",
         description = "Checks the value of a stock (?); to be updated",
         options = [
             interactions.Option(

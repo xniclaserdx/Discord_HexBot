@@ -11,7 +11,7 @@ class CoreModule(interactions.Extension):
         name = "hex_date",
         description = "Prints the current date"
     )
-    async def date_command(ctx: interactions.CommandContext):
+    async def date_command(self,ctx: interactions.CommandContext):
         today = datetime.datetime.today()
         await ctx.send(f"{today:%B %d, %Y}")
 
@@ -21,7 +21,7 @@ class CoreModule(interactions.Extension):
         name = "hex_hi",
         description = "A friendly greeting"
     )
-    async def hi_command(ctx: interactions.CommandContext):
+    async def hi_command(self,ctx: interactions.CommandContext):
         await ctx.send(f"Hallo, {ctx.user} <3")
 
     # command for rng
@@ -43,15 +43,15 @@ class CoreModule(interactions.Extension):
             )
         ]
     )
-    async def rng_command(ctx: interactions.CommandContext,lower_bound: int, upper_bound: int):
+    async def rng_command(self,ctx: interactions.CommandContext,lower_bound: int, upper_bound: int):
         await ctx.send(str(random.randint(lower_bound,upper_bound)))
 
     # command for coinflip
     @interactions.extension_command(
-        name = "coinflip",
+        name = "hex_coinflip",
         description = "Flips a coin"
     )
-    async def coinflip_command(ctx: interactions.CommandContext):
+    async def coinflip_command(self,ctx: interactions.CommandContext):
         await ctx.send("Kopf" if random.randint(0,1)==1 else "Zahl")
 
 def setup(client):
