@@ -5,7 +5,6 @@ import aiohttp
 import numpy as np
 
 async def texToPng(latex):
-    print(latex)
     payload = {
         'format': 'png',
         'code': latex,

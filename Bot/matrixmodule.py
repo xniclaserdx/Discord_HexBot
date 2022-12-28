@@ -45,8 +45,10 @@ def matrixToTex(matrix):
     matTexMid = ''
     for i in range(rows):
         for j in range(cols):
-            if j == 0:
+            if j == 0 and j != cols-1:
                 matTexMid += str(matrix.item((i,j)))
+            elif j == 0 and j == cols-1:
+                matTexMid += str(matrix.item((i,j)))+r'\\'
             elif j == cols-1:
                 matTexMid += r'&'+ str(matrix.item((i,j)))+r'\\'
             else:
