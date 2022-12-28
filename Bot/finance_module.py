@@ -1,6 +1,6 @@
 import yfinance as yahooFinance
 import datetime
-
+import interactions
 
 def get_market_price(ticker):
     try:
@@ -20,3 +20,25 @@ def get_history(ticker):
 
     print(data.tail())
 
+class FinanceModule(interactions.Extension):
+    def __init__(self,client):
+        self.client = client
+
+    # command to get stock values
+    @interactions.extension_command(
+        name ="finance_price",
+        description = "Checks the value of a stock (?); to be updated",
+        options = [
+            interactions.Option(
+                name = "stock",
+                description = "Stock name",
+                type = interactions.OptionType.STRING,
+                required = True
+            )
+        ]
+    )
+    async def finance_price_command(self,ctx: interactions.CommandContext, stock: str):
+        await ctx.send(get_market_price(stock))
+
+def setup(client):
+    FinanceModule(client)

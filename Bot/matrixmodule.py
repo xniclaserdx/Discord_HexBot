@@ -1,5 +1,8 @@
 import numpy as np
 import texmodule
+import interactions
+from interactions.ext.files import command_send
+import io
 
 async def mathInputEvaluate(args):
     # return await texmodule.texToPng(r'\documentclass{article}\usepackage{xcolor}\begin{document}\thispagestyle{empty}$\frac{3}{2} \cdot \frac{2}{3} = 1$ \end{document}')
@@ -275,3 +278,32 @@ class SubtractionOperandError(Exception):
     
 class MatrixSubtractionError(Exception):
     pass
+
+class MatrixModule(interactions.Extension):
+    def __init__(self,client):
+        self.client = client
+    
+    # command for matrix calculations
+    @interactions.extension_command(
+        name = "hex_matrix",
+        description = "Can perfom multiple matrix operations",
+        options = [
+            interactions.Option(
+                name = "expression",
+                description = "expression to be evaluated, matrix format: (1,2;3,4), spaces between inputs needed",
+                type = interactions.OptionType.STRING,
+                required = True
+            )
+        ]
+    )
+    async def matrix_command(self,ctx: interactions.CommandContext, expression: str):
+        expression_args = expression.split(" ")
+        image = await mathInputEvaluate(expression_args)
+        imageByteArr = io.BytesIO()
+        image.save(imageByteArr,format='PNG')
+        imageByteArr.seek(0)
+        await command_send(ctx,"",files = interactions.File(fp = imageByteArr,filename="response.png"))
+
+
+def setup(client):
+    MatrixModule(client)
