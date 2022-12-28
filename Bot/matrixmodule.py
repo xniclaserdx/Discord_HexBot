@@ -46,14 +46,20 @@ def matrixToTex(matrix):
     for i in range(rows):
         for j in range(cols):
             if j == 0 and j != cols-1:
-                matTexMid += str(matrix.item((i,j)))
+                matTexMid += str(getMatItem(matrix,(i,j)))
             elif j == 0 and j == cols-1:
-                matTexMid += str(matrix.item((i,j)))+r'\\'
+                matTexMid += str(getMatItem(matrix,(i,j)))+r'\\'
             elif j == cols-1:
-                matTexMid += r'&'+ str(matrix.item((i,j)))+r'\\'
+                matTexMid += r'&'+ str(getMatItem(matrix,(i,j)))+r'\\'
             else:
-                matTexMid += r'&'+ str(matrix.item((i,j)))
+                matTexMid += r'&'+ str(getMatItem(matrix,(i,j)))
     return matTexBeg+matTexMid+matTexEnd
+
+def getMatItem(matrix,position):
+    if int(matrix.item(position)) == matrix.item(position):
+        return int(matrix.item(position))
+    else:
+        return matrix.item(position)
 
 def texOut(input_,output):
     latexStart = r'\documentclass{article}\begin{document}\thispagestyle{empty}$'
@@ -216,7 +222,7 @@ def formatInput(input):
                 mat_rows = list(map(lambda x: x.split(" "),mat_rows))
                 for r,row in enumerate(mat_rows):
                     for c,element in enumerate(row):
-                        mat_rows[r][c] = int(element)
+                        mat_rows[r][c] = float(element)
                 return Element(np.array(mat_rows),"matrix","None")
             except:
                 raise MatrixParseError
