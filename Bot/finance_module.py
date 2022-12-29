@@ -71,7 +71,6 @@ class FinanceModule(interactions.Extension):
         ]
     )
     async def finance_plot_command(self,ctx: interactions.CommandContext, ticker: str):
-        get_history(ticker)
         await command_send(ctx,"",files = interactions.File(fp = get_history(ticker),filename='plot.png'))
         
 def setup(client):
