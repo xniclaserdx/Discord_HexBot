@@ -5,7 +5,7 @@ from interactions.ext.files import command_send
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import io
-import os 
+
 
 def get_market_price(ticker):
     try:
@@ -15,7 +15,7 @@ def get_market_price(ticker):
         except:
             return f" Market Price: {financeData.info['regularMarketPrice']} $"
     except:
-        return f"No data found."
+        return f'{ticker.upper()} could not be resolved.'
 def get_history(ticker):
     now = datetime.datetime.now()
     start_date = (now - datetime.timedelta(days=365*2)).strftime("%Y-%m-%d")
@@ -23,20 +23,21 @@ def get_history(ticker):
     data = yahooFinance.download(ticker, start_date, end_date)
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(data.index, data['Close'], color='#43B581')
+
     ax.spines['top'].set_color('white')
     ax.spines['bottom'].set_color('white')
     ax.spines['left'].set_color('white')
     ax.spines['right'].set_color('white')
+
     ax.tick_params(axis='both', colors='white')
+
     ax.set_xlabel('Date', color='white')
     ax.set_ylabel('Close Price (USD)', color='white')
     ax.set_title(f'{ticker.upper()} Stock Price', color='white')
-    
     imageByteArr = io.BytesIO()
     plt.savefig(imageByteArr, dpi=200, transparent=True)
     imageByteArr.seek(0)
     return imageByteArr
-
 
 class FinanceModule(interactions.Extension):
     def __init__(self,client):
@@ -70,6 +71,8 @@ class FinanceModule(interactions.Extension):
         ]
     )
     async def finance_plot_command(self,ctx: interactions.CommandContext, ticker: str):
+        get_history(ticker)
         await command_send(ctx,"",files = interactions.File(fp = get_history(ticker),filename='plot.png'))
+        
 def setup(client):
     FinanceModule(client)
