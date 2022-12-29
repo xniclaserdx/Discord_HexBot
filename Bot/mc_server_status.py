@@ -31,7 +31,7 @@ class McServerStatusModule(interactions.Extension):
             ),
             interactions.Option(
                 name = "port",
-                description = "Port (hab kein Plan wofür der ist, gerne ergänzen)",
+                description = "Port of the Minecraft server. The default port is the standard port 25565, if none entered. ",
                 type = interactions.OptionType.INTEGER,
                 required = False,
             )
