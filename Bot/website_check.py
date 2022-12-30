@@ -18,8 +18,8 @@ class WebsiteCheckModule(interactions.Extension):
         description = "Checks if a website is offline",
         options = [
             interactions.Option(
-                name = "website",
-                description = "Website to be checked",
+                name = "url",
+                description = "Full url of the website to be checked",
                 type = interactions.OptionType.STRING,
                 required = True
             )
