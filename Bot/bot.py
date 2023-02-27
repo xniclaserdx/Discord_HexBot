@@ -1,5 +1,7 @@
 import os
 import interactions
+import schedule
+import time
 
 def _get_extensions():
     yield 'basiscalc'
@@ -7,6 +9,7 @@ def _get_extensions():
     yield 'mc_server_status'
     yield 'website_check'
     yield 'matrixmodule'
+    yield 'rss_mindstar'
 
 
 text_file = open(os.path.dirname(os.path.abspath(__file__))+"/TOKEN.txt", "r")
@@ -21,9 +24,20 @@ for i in _get_extensions():
     print("extension loaded: "+ i)
 print("extensions loaded successfully")
 
-# successful start
 @client.event
 async def on_ready():
-    print('Logged in successfully')
+    print(f"Logged in!")
+    print(f"Bot is in {len(client.guilds)} guild(s):")
+    for guild in client.guilds:
+        print(f'Logged in to {guild.name} (ID: {guild.id})')
+        for channel in await guild.get_all_channels():
+            print(f'Channel {channel}')
+    # schedule.every().day.at("21:10").do(check_prices)
+
+    await client._extensions["RSS_mindstarModule"].check_prices(client)
+    
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
 client.start()
