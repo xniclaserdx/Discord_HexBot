@@ -267,7 +267,7 @@ New features are currently in development! Stay tuned for updates.
 
 - Built with [discord-py-interactions](https://github.com/interactions-py/library)
 - Stock data provided by [Yahoo Finance](https://finance.yahoo.com/)
-- LaTeX rendering powered by [rtex](http://rtex.probablyaweb.site/)
+- LaTeX rendering powered by [rtex](http://rtex.probablyaweb.site/) *(Note: Uses HTTP connection)*
 - Minecraft server status via [mcstatus](https://github.com/py-mine/mcstatus)
 
 ## 📞 Support
