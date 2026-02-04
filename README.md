@@ -19,7 +19,7 @@ A versatile Discord bot written in Python with multiple utility features includi
 
 - **Core Commands**: Date display, greetings, random number generation, and coin flipping
 - **Mathematical Operations**: Base conversion and advanced matrix calculations with LaTeX rendering
-- **Finance Module**: Real-time stock prices and historical price charts
+- **Finance Module**: Real-time stock prices, historical price charts, and stock trend predictions using technical analysis
 - **Minecraft Integration**: Server status and player count checking
 - **Website Monitoring**: Check if websites are online or offline
 - **RSS Feed Monitoring**: Automated Mindstar deal notifications with price tracking
@@ -155,6 +155,14 @@ All commands use Discord's slash command system. Type `/` in Discord to see avai
 |---------|-------------|------------|---------|
 | `/hex_stock_price` | Get current stock price | `ticker` | `/hex_stock_price ticker:AAPL` |
 | `/hex_stock_plot` | Generate 2-year price chart | `ticker` | `/hex_stock_plot ticker:TSLA` |
+| `/hex_stock_predict` | Predict stock trend using technical analysis | `ticker` | `/hex_stock_predict ticker:MSFT` |
+
+**Stock Prediction Features:**
+- 7-day and 20-day moving averages
+- Momentum analysis (7-day price change)
+- Volatility calculation
+- Trend classification (Bullish, Bearish, or Neutral)
+- Short-term prediction based on technical indicators
 
 Supported tickers: Any valid Yahoo Finance ticker symbol (e.g., AAPL, GOOGL, MSFT, BTC-USD)
 
