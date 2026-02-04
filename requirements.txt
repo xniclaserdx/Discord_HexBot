@@ -1,0 +1,27 @@
+# Discord HexBot Requirements
+# Core Discord bot framework
+discord-py-interactions>=4.0.0
+
+# Financial data
+yfinance>=0.2.0
+
+# Data visualization
+matplotlib>=3.5.0
+
+# Minecraft server status
+mcstatus>=10.0.0
+
+# RSS feed parsing
+feedparser>=6.0.0
+
+# Numerical computing
+numpy>=1.21.0
+
+# Image processing
+Pillow>=9.0.0
+
+# HTTP client
+aiohttp>=3.8.0
+
+# Task scheduling (currently unused but in imports)
+schedule>=1.1.0
