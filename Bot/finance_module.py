@@ -9,6 +9,12 @@ import io
 import numpy as np
 
 
+# Constants for stock prediction
+PREDICTION_HISTORY_DAYS = 60
+STRONG_MOMENTUM_THRESHOLD = 2.0
+MODERATE_MOMENTUM_THRESHOLD = 1.0
+
+
 def get_market_price(ticker: str) -> str:
     """
     Get the current market price for a given stock ticker.
@@ -87,7 +93,7 @@ def get_stock_prediction(ticker: str) -> str:
     try:
         # Get historical data for the last 60 days
         now = datetime.datetime.now()
-        start_date = (now - datetime.timedelta(days=60)).strftime("%Y-%m-%d")
+        start_date = (now - datetime.timedelta(days=PREDICTION_HISTORY_DAYS)).strftime("%Y-%m-%d")
         end_date = now.strftime("%Y-%m-%d")
         
         data = yahooFinance.download(ticker, start_date, end_date, progress=False)
@@ -106,6 +112,9 @@ def get_stock_prediction(ticker: str) -> str:
         current_price = close_prices[-1]
         
         # Calculate momentum (price change over last 7 days)
+        # Protect against division by zero
+        if close_prices[-7] == 0:
+            return f"{ticker.upper()} - Invalid historical data (zero price detected)."
         momentum = ((current_price - close_prices[-7]) / close_prices[-7]) * 100
         
         # Calculate volatility (standard deviation)
@@ -114,7 +123,7 @@ def get_stock_prediction(ticker: str) -> str:
         # Determine trend
         if ma_7 > ma_20:
             trend = "BULLISH 📈"
-            if momentum > 2:
+            if momentum > STRONG_MOMENTUM_THRESHOLD:
                 strength = "Strong"
             elif momentum > 0:
                 strength = "Moderate"
@@ -122,7 +131,7 @@ def get_stock_prediction(ticker: str) -> str:
                 strength = "Weak"
         elif ma_7 < ma_20:
             trend = "BEARISH 📉"
-            if momentum < -2:
+            if momentum < -STRONG_MOMENTUM_THRESHOLD:
                 strength = "Strong"
             elif momentum < 0:
                 strength = "Moderate"
@@ -142,11 +151,11 @@ def get_stock_prediction(ticker: str) -> str:
         prediction += f"Volatility: ${volatility:.2f}\n\n"
         
         # Add recommendation
-        if trend == "BULLISH 📈" and momentum > 1:
+        if trend == "BULLISH 📈" and momentum > MODERATE_MOMENTUM_THRESHOLD:
             prediction += "💡 Prediction: Short-term upward trend likely to continue."
-        elif trend == "BEARISH 📉" and momentum < -1:
+        elif trend == "BEARISH 📉" and momentum < -MODERATE_MOMENTUM_THRESHOLD:
             prediction += "💡 Prediction: Short-term downward trend likely to continue."
-        elif abs(momentum) < 1:
+        elif abs(momentum) < MODERATE_MOMENTUM_THRESHOLD:
             prediction += "💡 Prediction: Price consolidation expected in the short term."
         else:
             prediction += "💡 Prediction: Trend reversal may be forming."
