@@ -6,6 +6,7 @@ from interactions.ext.files import command_send
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import io
+import numpy as np
 
 
 def get_market_price(ticker: str) -> str:
@@ -72,6 +73,92 @@ def get_history(ticker: str) -> io.BytesIO:
         # Clean up matplotlib resources
         plt.close(fig)
 
+
+def get_stock_prediction(ticker: str) -> str:
+    """
+    Predict stock trend using moving averages and momentum analysis.
+    
+    Args:
+        ticker: Stock ticker symbol (e.g., 'AAPL', 'GOOGL')
+        
+    Returns:
+        String with prediction analysis or error message
+    """
+    try:
+        # Get historical data for the last 60 days
+        now = datetime.datetime.now()
+        start_date = (now - datetime.timedelta(days=60)).strftime("%Y-%m-%d")
+        end_date = now.strftime("%Y-%m-%d")
+        
+        data = yahooFinance.download(ticker, start_date, end_date, progress=False)
+        
+        if data.empty or len(data) < 20:
+            return f"{ticker.upper()} - Insufficient data for prediction."
+        
+        # Get stock info
+        finance_data = yahooFinance.Ticker(ticker)
+        short_name = finance_data.info.get('shortName', ticker.upper())
+        
+        # Calculate moving averages
+        close_prices = data['Close'].values
+        ma_7 = np.mean(close_prices[-7:])  # 7-day moving average
+        ma_20 = np.mean(close_prices[-20:])  # 20-day moving average
+        current_price = close_prices[-1]
+        
+        # Calculate momentum (price change over last 7 days)
+        momentum = ((current_price - close_prices[-7]) / close_prices[-7]) * 100
+        
+        # Calculate volatility (standard deviation)
+        volatility = np.std(close_prices[-20:])
+        
+        # Determine trend
+        if ma_7 > ma_20:
+            trend = "BULLISH 📈"
+            if momentum > 2:
+                strength = "Strong"
+            elif momentum > 0:
+                strength = "Moderate"
+            else:
+                strength = "Weak"
+        elif ma_7 < ma_20:
+            trend = "BEARISH 📉"
+            if momentum < -2:
+                strength = "Strong"
+            elif momentum < 0:
+                strength = "Moderate"
+            else:
+                strength = "Weak"
+        else:
+            trend = "NEUTRAL ➡️"
+            strength = "Consolidating"
+        
+        # Build prediction message
+        prediction = f"**Stock Prediction for {short_name}**\n\n"
+        prediction += f"Current Price: ${current_price:.2f}\n"
+        prediction += f"7-Day MA: ${ma_7:.2f}\n"
+        prediction += f"20-Day MA: ${ma_20:.2f}\n"
+        prediction += f"7-Day Momentum: {momentum:+.2f}%\n\n"
+        prediction += f"**Trend: {trend}** ({strength})\n"
+        prediction += f"Volatility: ${volatility:.2f}\n\n"
+        
+        # Add recommendation
+        if trend == "BULLISH 📈" and momentum > 1:
+            prediction += "💡 Prediction: Short-term upward trend likely to continue."
+        elif trend == "BEARISH 📉" and momentum < -1:
+            prediction += "💡 Prediction: Short-term downward trend likely to continue."
+        elif abs(momentum) < 1:
+            prediction += "💡 Prediction: Price consolidation expected in the short term."
+        else:
+            prediction += "💡 Prediction: Trend reversal may be forming."
+        
+        prediction += "\n\n⚠️ *This is not financial advice. Past performance does not guarantee future results.*"
+        
+        return prediction
+        
+    except Exception as e:
+        return f"{ticker.upper()} - Unable to generate prediction. Error: {str(e)}"
+
+
 class FinanceModule(interactions.Extension):
     """Extension module for finance and stock market commands."""
     
@@ -109,6 +196,22 @@ class FinanceModule(interactions.Extension):
     async def finance_plot_command(self, ctx: interactions.CommandContext, ticker: str):
         """Generate and send a 2-year stock price chart."""
         await command_send(ctx, "", files=interactions.File(fp=get_history(ticker), filename='plot.png'))
+
+    @interactions.extension_command(
+        name="hex_stock_predict",
+        description="Predict stock trend using technical analysis (moving averages and momentum).",
+        options=[
+            interactions.Option(
+                name="ticker",
+                description="Stock ticker",
+                type=interactions.OptionType.STRING,
+                required=True
+            )
+        ]
+    )
+    async def finance_predict_command(self, ctx: interactions.CommandContext, ticker: str):
+        """Generate stock prediction based on technical analysis."""
+        await ctx.send(get_stock_prediction(ticker))
         
 
 def setup(client):
