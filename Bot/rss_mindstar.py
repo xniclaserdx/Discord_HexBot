@@ -1,6 +1,6 @@
 """Module for monitoring Mindstar RSS feed for deals."""
 import feedparser
-import time
+import asyncio
 import interactions
 
 
@@ -30,7 +30,7 @@ class RSS_mindstarModule(interactions.Extension):
                 
             for item in feed["items"]:
                 try:
-                    time.sleep(3)  # Rate limiting
+                    await asyncio.sleep(3)  # Rate limiting
                     
                     # Parse prices
                     price = float(item["_price"].replace(".", "").replace(",", ".")) / 100
