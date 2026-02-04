@@ -32,7 +32,8 @@ async def texToPng(latex: str) -> PIL.Image.Image:
                 req.raise_for_status()
                 jdata = await req.json()
                 if jdata['status'] == 'error':
-                    raise RenderingError("LaTeX rendering failed")
+                    error_detail = jdata.get('error', jdata.get('message', 'Unknown error'))
+                    raise RenderingError(f"LaTeX rendering failed: {error_detail}")
                 filename = jdata['filename']
             
             async with session.get('http://rtex.probablyaweb.site/api/v2' + '/' + filename, timeout=3) as img_req:

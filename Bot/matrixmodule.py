@@ -24,7 +24,8 @@ async def math_input_evaluate(args: list) -> bytes:
             formatted_input_list[i] = format_input(args[i])
         except Exception:
             # Formatting error
-            return await texmodule.texToPng(tex_err_out("Formatting error"))
+            error_msg = "Invalid matrix format. Expected format: (1,2;3,4) with spaces between elements"
+            return await texmodule.texToPng(tex_err_out(error_msg))
     
     tex_string = tex_out(
         element_list_to_tex(formatted_input_list),
@@ -231,7 +232,7 @@ def mult_evaluation(element_list: list) -> tuple:
             try:
                 mult_eval = np.matmul(element_list[i-1].value, element_list[i+1].value)
             except ValueError:
-                raise MatrixMultiplicationError
+                raise MatrixMultiplicationError("Matrix dimensions incompatible for multiplication")
             res = elements_join(before_mult, mult_eval, after_mult)
             return evaluate_expression(res), True
     return None, False
@@ -259,14 +260,14 @@ def addsub_evaluation(element_list: list) -> tuple:
                 try:
                     add_eval = np.add(element_list[i-1].value, element_list[i+1].value)
                 except ValueError:
-                    raise MatrixAdditionError
+                    raise MatrixAdditionError("Matrix dimensions must match for addition")
                 res = elements_join(before_op, add_eval, after_op)
                 return evaluate_expression(res), True
             else:  # subtraction
                 try:
                     sub_eval = np.subtract(element_list[i-1].value, element_list[i+1].value)
                 except ValueError:
-                    raise MatrixSubtractionError
+                    raise MatrixSubtractionError("Matrix dimensions must match for subtraction")
                 res = elements_join(before_op, sub_eval, after_op)
                 return evaluate_expression(res), True
     return None, False
